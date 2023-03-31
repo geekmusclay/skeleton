@@ -2,8 +2,12 @@ version: "3.9"
 
 services:
   app:
-    image: thecodingmachine/php:7.4-v4-apache
-    volumes: 
+    image: thecodingmachine/php:8.2-v4-apache
+    volumes:
+      - ../di-container:/var/www/di-container
+      - ../framework:/var/www/framework
+      - ../orm:/var/www/orm
+      - ../router:/var/www/router
       - .:/var/www/html
     depends_on:
       - mysql
@@ -12,21 +16,19 @@ services:
     environment:
       APACHE_DOCUMENT_ROOT: public/
       PHP_EXTENSION_XDEBUG: 0
-  
+
   mysql:
     image: mysql:8
     environment:
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      MYSQL_DATABASE: symfony
+      MYSQL_DATABASE: skeleton
       MYSQL_ROOT_PASSWORD: root
-  
+
   phpmyadmin:
-    image: phpmyadmin
+    image: phpmyadmin:latest
     ports:
       - 8080:80
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306
-      PMA_USER: user
-      PMA_PASSWORD: password
