@@ -8,7 +8,6 @@ use Tracy\Debugger;
 
 use Geekmusclay\ORM\DB;
 use function Http\Response\send;
-use App\Controller\HomeController;
 use Geekmusclay\DI\Core\Container;
 use GuzzleHttp\Psr7\ServerRequest;
 use Geekmusclay\Framework\Core\App;
@@ -42,7 +41,7 @@ $router = $container->get(Router::class, [$container]);
 $container->set(RouterInterface::class, $router);
 
 // Register views root dir
-$container->set('view.path', __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR .'templates');
+$container->set('view.path', __DIR__ . DS . '..' . DS .'templates');
 // Register twig configuration
 $container->set('twig.config', []);
 // Instnciating TwigRenderer by factory
@@ -51,7 +50,12 @@ $renderer = $container->get(TwigRendererFactory::class);
 $container->set(TwigRenderer::class, $renderer);
 
 $app = new App($container);
-$app->register(HomeController::class);
+
+$path = __DIR__ . DS . '..' . DS . 'src' . DS . 'Controller';
+$app->registerDir(
+    $path,
+    'App\\Controller'
+);
 
 $response = $app->run(ServerRequest::fromGlobals());
 
