@@ -4,25 +4,29 @@ declare(strict_types=1);
 
 require "../vendor/autoload.php";
 
-use App\Controller\HomeController;
+use Tracy\Debugger;
 
+use Geekmusclay\ORM\DB;
 use function Http\Response\send;
+use App\Controller\HomeController;
 use Geekmusclay\DI\Core\Container;
 use GuzzleHttp\Psr7\ServerRequest;
 use Geekmusclay\Framework\Core\App;
 use Geekmusclay\Router\Core\Router;
+
 use Geekmusclay\Framework\Core\DotEnv;
 use Geekmusclay\Framework\Renderer\TwigRenderer;
-
 use Geekmusclay\Router\Interfaces\RouterInterface;
 use Geekmusclay\Framework\Factory\TwigRendererFactory;
-use Geekmusclay\ORM\DB;
+
+Debugger::enable();
 
 $env = getenv('APP_ENV');
 $path = __DIR__ . '/.env';
 if ((false === $env || $env === 'dev') && is_file($path)) {
     // Loading environement variables
     DotEnv::load($path);
+    Debugger::$productionMode = false;
 }
 
 // Instanciate application DI Container
@@ -49,10 +53,6 @@ $container->set(TwigRenderer::class, $renderer);
 $app = new App($container);
 $app->register(HomeController::class);
 
-try {
-    $response = $app->run(ServerRequest::fromGlobals());
-} catch (Throwable $e) {
-    dd($e);
-}
+$response = $app->run(ServerRequest::fromGlobals());
 
 send($response);
