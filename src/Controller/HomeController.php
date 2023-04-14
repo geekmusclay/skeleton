@@ -10,6 +10,7 @@ use Geekmusclay\Framework\Renderer\TwigRenderer;
 use Geekmusclay\Router\Core\JsonResponse;
 use GuzzleHttp\Psr7\Response;
 use Geekmusclay\Router\Attribute\Route;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 final class HomeController extends AbstractController
 {
@@ -31,10 +32,16 @@ final class HomeController extends AbstractController
     }
 
     #[Route(path: '/api', name: 'app.api')]
-    public function api(): JsonResponse
+    public function api(Request $request): JsonResponse
     {
+        $limit = 10;
+        $params = $request->getQueryParams();
+        if (true === isset($params['limit'])) {
+            $limit = (int) $params['limit'];
+        }
+
         $res = [];
-        foreach (Article::all(10) as $article) {
+        foreach (Article::all($limit) as $article) {
             $res[] = $article->serialize();
         }
 
