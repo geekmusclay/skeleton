@@ -17,6 +17,7 @@ use Geekmusclay\Framework\Core\DotEnv;
 use Geekmusclay\Framework\Renderer\TwigRenderer;
 use Geekmusclay\Router\Interfaces\RouterInterface;
 use Geekmusclay\Framework\Factory\TwigRendererFactory;
+use Geekmusclay\Framework\Interfaces\RendererInterface;
 
 Debugger::enable();
 
@@ -48,6 +49,8 @@ $container->set('twig.config', []);
 $renderer = $container->get(TwigRendererFactory::class);
 // Register TwigRenderer for injections
 $container->set(TwigRenderer::class, $renderer);
+// Default renderer
+$container->set(RendererInterface::class, $renderer);
 
 $app = new App($container);
 
