@@ -8,5 +8,9 @@ use Geekmusclay\ORM\Entity\Model;
 
 class Article extends Model
 {
-    // Some code here ...
+    protected array $data = [
+        'title' => 'Default title',
+        'subtitle' => 'Default subtitle',
+        'body' => 'Default body'
+    ];
 }
