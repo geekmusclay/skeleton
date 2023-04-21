@@ -1,19 +1,21 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
 namespace App\Controller;
 
-use Throwable;
 use App\Model\Article;
-use GuzzleHttp\Psr7\Response;
-use Geekmusclay\Router\Attribute\Route;
-use Geekmusclay\Framework\Core\Encrypter;
-use Psr\Http\Message\ServerRequestInterface;
-use Geekmusclay\Router\Interfaces\RouterInterface;
 use Geekmusclay\Framework\Common\AbstractController;
+use Geekmusclay\Framework\Core\Encrypter;
 use Geekmusclay\Framework\Interfaces\RendererInterface;
+use Geekmusclay\Router\Attribute\Route;
+use Geekmusclay\Router\Interfaces\RouterInterface;
+use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Throwable;
+
+use function count;
 
 #[Route(path: '/articles')]
 final class ArticleController extends AbstractController
@@ -36,27 +38,37 @@ final class ArticleController extends AbstractController
      */
     public function __construct(
         RendererInterface $renderer,
-        RouterInterface   $router,
-        Encrypter         $encrypter
+        RouterInterface $router,
+        Encrypter $encrypter
     ) {
         $this->renderer  = $renderer;
         $this->router    = $router;
         $this->encrypter = $encrypter;
     }
 
-    #[Route(path: '/', name: 'article.index')]
+    #[Route(
+        path: '/',
+        name: 'article.index'
+    )]
     public function index(): Response
     {
         $articles = Article::all();
 
-        return $this->render('artiicles/index.html.twig', [
-            'articles' => $articles
-        ]);
+        return $this->render(
+            'artiicles/index.html.twig',
+            [
+                'articles' => $articles,
+            ]
+        );
     }
 
-    #[Route(path: '/:id', name: 'article.details', with: [
-        'id' => '[a-zA-Z0-9]+'
-    ])]
+    #[Route(
+        path: '/:id',
+        name: 'article.details',
+        with: [
+            'id' => '[a-zA-Z0-9]+',
+        ]
+    )]
     public function detail(ServerRequestInterface $request, string $id): Response
     {
         $decrypt = $this->encrypter->decrypt($id);
@@ -69,27 +81,40 @@ final class ArticleController extends AbstractController
             return $this->redirect($request, 'app.home');
         }
 
-        return $this->render('articles/details.html.twig', [
-            'article' => $article
-        ]);
+        return $this->render(
+            'articles/details.html.twig',
+            [
+                'article' => $article,
+            ]
+        );
     }
 
-    #[Route(path: '/add', name: 'article.add')]
+    #[Route(
+        path: '/add',
+        name: 'article.add'
+    )]
     public function add(): Response
     {
         return $this->render('articles/add.html.twig');
     }
 
-    #[Route(method: 'POST', path: '/store', name: 'article.store')]
+    #[Route(
+        method: 'POST',
+        path: '/store',
+        name: 'article.store'
+    )]
     public function store(Request $request): Response
     {
         $data = $request->getParsedBody();
         if (null === $data || 0 === count($data)) {
-            return $this->render('articles/add.html.twig', [
-                'errors' => [
-                    'Wrong form'
+            return $this->render(
+                'articles/add.html.twig',
+                [
+                    'errors' => [
+                        'Wrong form',
+                    ],
                 ]
-            ]);
+            );
         }
 
         $article = new Article($data);
@@ -101,14 +126,22 @@ final class ArticleController extends AbstractController
             return $this->redirect($request, 'app.home');
         }
 
-        return $this->render('articles/store.html.twig', [
-            'article' => $article
-        ]);
+        return $this->render(
+            'articles/store.html.twig',
+            [
+                'article' => $article,
+            ]
+        );
     }
 
-    #[Route(method: 'GET', path: '/edit/:id', name: 'article.edit', with: [
-        'id' => '[a-zA-Z0-9]+'
-    ])]
+    #[Route(
+        method: 'GET',
+        path: '/edit/:id',
+        name: 'article.edit',
+        with: [
+            'id' => '[a-zA-Z0-9]+',
+        ]
+    )]
     public function edit(Request $request, string $id): Response
     {
         $decrypt = $this->encrypter->decrypt($id);
@@ -121,14 +154,22 @@ final class ArticleController extends AbstractController
             return $this->redirect($request, 'app.home');
         }
 
-        return $this->render('articles/store.html.twig', [
-            'article' => $article
-        ]);
+        return $this->render(
+            'articles/store.html.twig',
+            [
+                'article' => $article,
+            ]
+        );
     }
 
-    #[Route(method: 'POST', path: '/update/:id', name: 'article.update', with: [
-        'id' => '[a-zA-Z0-9]+'
-    ])]
+    #[Route(
+        method: 'POST',
+        path: '/update/:id',
+        name: 'article.update',
+        with: [
+            'id' => '[a-zA-Z0-9]+',
+        ]
+    )]
     public function update(Request $request, string $id): Response
     {
         $decrypt = $this->encrypter->decrypt($id);
@@ -138,11 +179,14 @@ final class ArticleController extends AbstractController
 
         $data = $request->getParsedBody();
         if (null === $data || 0 === count($data)) {
-            return $this->render('articles/edit.html.twig', [
-                'errors' => [
-                    'Wrong form'
+            return $this->render(
+                'articles/edit.html.twig',
+                [
+                    'errors' => [
+                        'Wrong form',
+                    ],
                 ]
-            ]);
+            );
         }
 
         $article = new Article($data);
@@ -154,8 +198,11 @@ final class ArticleController extends AbstractController
             return $this->redirect($request, 'app.home');
         }
 
-        return $this->render('articles/store.html.twig', [
-            'article' => $article
-        ]);
+        return $this->render(
+            'articles/store.html.twig',
+            [
+                'article' => $article,
+            ]
+        );
     }
 }

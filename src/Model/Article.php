@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -9,8 +9,8 @@ use Geekmusclay\ORM\Entity\Model;
 class Article extends Model
 {
     protected array $data = [
-        'title' => 'Default title',
+        'title'    => 'Default title',
         'subtitle' => 'Default subtitle',
-        'body' => 'Default body'
+        'body'     => 'Default body',
     ];
 }

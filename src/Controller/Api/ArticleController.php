@@ -1,13 +1,13 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
 namespace App\Controller\Api;
 
 use App\Model\Article;
+use Geekmusclay\Framework\Common\AbstractController;
 use Geekmusclay\Router\Attribute\Route;
 use Geekmusclay\Router\Core\JsonResponse;
-use Geekmusclay\Framework\Common\AbstractController;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
