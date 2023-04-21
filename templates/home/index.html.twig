@@ -17,7 +17,7 @@
                     {% for article in articles %}
                         <li>
                             {{ article.title }} -
-                            <a href="{{ path('article.details', { id: article.id }) }}">View</a>
+                            <a href="{{ path('article.details', { id: article.id|encrypt }) }}">View</a>
                         </li>
                     {% endfor %}
                 </ul>
