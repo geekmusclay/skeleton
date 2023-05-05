@@ -63,33 +63,6 @@ final class ArticleController extends AbstractController
     }
 
     #[Route(
-        path: '/:id',
-        name: 'article.details',
-        with: [
-            'id' => '[a-zA-Z0-9]+',
-        ]
-    )]
-    public function detail(ServerRequestInterface $request, string $id): Response
-    {
-        $decrypt = $this->encrypter->decrypt($id);
-        if (-1 === $decrypt) {
-            return $this->redirect($request, 'app.home');
-        }
-
-        $article = Article::find($decrypt);
-        if (false === $article) {
-            return $this->redirect($request, 'app.home');
-        }
-
-        return $this->render(
-            'articles/details.html.twig',
-            [
-                'article' => $article,
-            ]
-        );
-    }
-
-    #[Route(
         path: '/add',
         name: 'article.add'
     )]
@@ -128,6 +101,33 @@ final class ArticleController extends AbstractController
 
         return $this->render(
             'articles/store.html.twig',
+            [
+                'article' => $article,
+            ]
+        );
+    }
+
+    #[Route(
+        path: '/:id',
+        name: 'article.details',
+        with: [
+            'id' => '[a-zA-Z0-9]+',
+        ]
+    )]
+    public function detail(ServerRequestInterface $request, string $id): Response
+    {
+        $decrypt = $this->encrypter->decrypt($id);
+        if (-1 === $decrypt) {
+            return $this->redirect($request, 'app.home');
+        }
+
+        $article = Article::find($decrypt);
+        if (false === $article) {
+            return $this->redirect($request, 'app.home');
+        }
+
+        return $this->render(
+            'articles/details.html.twig',
             [
                 'article' => $article,
             ]
