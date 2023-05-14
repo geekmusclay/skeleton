@@ -6,12 +6,14 @@ Create a `.htaccess` file with :
 ```
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^ index.php [QSA,L]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L,NC]
 ```
 
 Create a `.env` file with : 
 ```
-DATABASE_URL=mysql:host=localhost;dbname=test_api
+APP_ENV=dev
+DATABASE_URL=mysql:host=localhost;dbname=skeleton
 DATABASE_USER=root
 DATABASE_PASSWORD=
 ```
@@ -22,25 +24,29 @@ declare(strict_types=1);
 
 require "../vendor/autoload.php";
 
-use App\Controller\HomeController;
+use Tracy\Debugger;
 
+use Geekmusclay\ORM\DB;
 use function Http\Response\send;
 use Geekmusclay\DI\Core\Container;
 use GuzzleHttp\Psr7\ServerRequest;
 use Geekmusclay\Framework\Core\App;
 use Geekmusclay\Router\Core\Router;
+
 use Geekmusclay\Framework\Core\DotEnv;
 use Geekmusclay\Framework\Renderer\TwigRenderer;
-
 use Geekmusclay\Router\Interfaces\RouterInterface;
 use Geekmusclay\Framework\Factory\TwigRendererFactory;
-use Geekmusclay\ORM\DB;
+use Geekmusclay\Framework\Interfaces\RendererInterface;
+
+Debugger::enable();
 
 $env = getenv('APP_ENV');
 $path = __DIR__ . '/.env';
 if ((false === $env || $env === 'dev') && is_file($path)) {
     // Loading environement variables
     DotEnv::load($path);
+    Debugger::$productionMode = false;
 }
 
 // Instanciate application DI Container
@@ -56,22 +62,26 @@ $router = $container->get(Router::class, [$container]);
 $container->set(RouterInterface::class, $router);
 
 // Register views root dir
-$container->set('view.path', __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR .'templates');
+$container->set('view.path', __DIR__ . DS . '..' . DS .'templates');
 // Register twig configuration
 $container->set('twig.config', []);
+
 // Instnciating TwigRenderer by factory
 $renderer = $container->get(TwigRendererFactory::class);
 // Register TwigRenderer for injections
 $container->set(TwigRenderer::class, $renderer);
+// Default renderer
+$container->set(RendererInterface::class, $renderer);
 
 $app = new App($container);
-$app->register(HomeController::class);
 
-try {
-    $response = $app->run(ServerRequest::fromGlobals());
-} catch (Throwable $e) {
-    dd($e);
-}
+$path = __DIR__ . DS . '..' . DS . 'src' . DS . 'Controller';
+$app->registerDir(
+    $path,
+    'App\\Controller'
+);
+
+$response = $app->run(ServerRequest::fromGlobals());
 
 send($response);
 ```
