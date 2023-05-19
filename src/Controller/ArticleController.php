@@ -13,6 +13,7 @@ use Geekmusclay\Router\Interfaces\RouterInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 use function count;
@@ -29,6 +30,9 @@ final class ArticleController extends AbstractController
     /** @var RouterInterface $router Application router */
     protected RouterInterface $router;
 
+    /** @var LoggerInterface $logger Application logging service */
+    private LoggerInterface $logger;
+
     /**
      * Controller constructor
      *
@@ -39,11 +43,13 @@ final class ArticleController extends AbstractController
     public function __construct(
         RendererInterface $renderer,
         RouterInterface $router,
-        Encrypter $encrypter
+        Encrypter $encrypter,
+        LoggerInterface $logger
     ) {
         $this->renderer  = $renderer;
         $this->router    = $router;
         $this->encrypter = $encrypter;
+        $this->logger    = $logger;
     }
 
     #[Route(
@@ -94,7 +100,11 @@ final class ArticleController extends AbstractController
         try {
             $article->save();
         } catch (Throwable $e) {
-            // Do something with the error
+            $this->logger->error($e->getMessage(), [
+                __FUNCTION__,
+                __METHOD__,
+                $e->getTrace()
+            ]);
 
             return $this->redirect($request, 'app.home');
         }
@@ -193,7 +203,11 @@ final class ArticleController extends AbstractController
         try {
             $article->save();
         } catch (Throwable $e) {
-            // Do something with the error
+            $this->logger->error($e->getMessage(), [
+                __FUNCTION__,
+                __METHOD__,
+                $e->getTrace()
+            ]);
 
             return $this->redirect($request, 'app.home');
         }
