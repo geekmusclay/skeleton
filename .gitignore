@@ -18,5 +18,7 @@ composer.lock
 public/.env
 
 # Database
-phinx.yml
-phinx.yaml
+phinx.*
+
+# Framework cache & files
+var
