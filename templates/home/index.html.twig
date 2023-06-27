@@ -10,5 +10,18 @@
                 <p>Path: <strong>{{ path('app.home') }}</strong></p>
             </div>
         </div>
+        <div class="row">
+            <div class="col-12">
+                <h2>Articles - <a href="{{ path('article.add') }}">Add</a></h2>
+                <ul>
+                    {% for article in articles %}
+                        <li>
+                            {{ article.title }} -
+                            <a href="{{ path('article.details', { id: article.id|encrypt }) }}">View</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
 {% endblock %}

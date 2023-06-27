@@ -19,3 +19,6 @@ public/.env
 
 # Database
 phinx.*
+
+# Framework cache & files
+var

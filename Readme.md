@@ -2,6 +2,7 @@
 
 ## Setup
 
+In a public directory
 Create a `.htaccess` file with : 
 ```
 RewriteEngine On
@@ -24,9 +25,13 @@ declare(strict_types=1);
 
 require "../vendor/autoload.php";
 
+use Monolog\Level;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\FirePHPHandler;
 use Tracy\Debugger;
 
-use Geekmusclay\ORM\DB;
+use Geekmusclay\ORM\Builder\DB;
 use function Http\Response\send;
 use Geekmusclay\DI\Core\Container;
 use GuzzleHttp\Psr7\ServerRequest;
@@ -38,6 +43,7 @@ use Geekmusclay\Framework\Renderer\TwigRenderer;
 use Geekmusclay\Router\Interfaces\RouterInterface;
 use Geekmusclay\Framework\Factory\TwigRendererFactory;
 use Geekmusclay\Framework\Interfaces\RendererInterface;
+use Psr\Log\LoggerInterface;
 
 Debugger::enable();
 
@@ -52,6 +58,15 @@ if ((false === $env || $env === 'dev') && is_file($path)) {
 // Instanciate application DI Container
 $container = new Container();
 
+// Create the logger
+$logger = new Logger('app_logger');
+// Now add some handlers
+$logger->pushHandler(new StreamHandler(__DIR__ . DS . '..' . DS . 'var' . DS . 'log/app.log', Level::Debug));
+$logger->pushHandler(new FirePHPHandler());
+
+// Add logger to container
+$container->set(LoggerInterface::class, $logger);
+
 // Instanciate db connector
 $db = new DB(getenv('DATABASE_URL'), getenv('DATABASE_USER'), getenv('DATABASE_PASSWORD'));
 $container->set(DB::class, $db);
@@ -65,7 +80,6 @@ $container->set(RouterInterface::class, $router);
 $container->set('view.path', __DIR__ . DS . '..' . DS .'templates');
 // Register twig configuration
 $container->set('twig.config', []);
-
 // Instnciating TwigRenderer by factory
 $renderer = $container->get(TwigRendererFactory::class);
 // Register TwigRenderer for injections
@@ -81,7 +95,15 @@ $app->registerDir(
     'App\\Controller'
 );
 
-$response = $app->run(ServerRequest::fromGlobals());
+try {
+    $response = $app->run(ServerRequest::fromGlobals());
+} catch (Throwable $e) {
+    $logger->critical($e->getMessage(), [
+        __FUNCTION__,
+        __METHOD__,
+        $e->getTrace()
+    ]);
+}
 
 send($response);
 ```
