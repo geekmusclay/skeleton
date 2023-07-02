@@ -21,7 +21,7 @@
         "guzzlehttp/psr7": "^2.4",
         "http-interop/response-sender": "^1.0",
         "twig/twig": "^3.4",
-        "geekmusclay/framework": "^0.2",
+        "geekmusclay/framework": "^0.2.4",
         "robmorgan/phinx": "^0.13.4",
         "symfony/yaml": "^6.2",
         "tracy/tracy": "^2.10",
